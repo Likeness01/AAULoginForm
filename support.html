@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support System</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .valid {
+            color: green;
+        }
+        .invalid {
+            color: red;
+        }
+        .message {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="support-container">
+        <h1>Contact Support</h1>
+        <form action="/submit_support_request" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <div id="nameMessage" class="message">
+                <p id="nameNumber" class="invalid">A number</p>
+                <p id="nameLength" class="invalid">Minimum 8 characters</p>
+            </div>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <div id="emailMessage" class="message">
+                <p id="emailFormat" class="invalid">Valid email format</p>
+            </div>
+
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" required>
+            <div id="subjectMessage" class="message">
+                <p id="subjectLength" class="invalid">Minimum 5 characters</p>
+            </div>
+
+            <label for="message">Message:</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+            <div id="textMessage" class="message">
+                <p id="messageLength" class="invalid">Minimum 100 characters</p>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        function addValidation(inputId, messageId, validations) {
+            const input = document.getElementById(inputId);
+            const message = document.getElementById(messageId);
+
+            input.onfocus = function() {
+                message.style.display = "block";
+            }
+
+            input.onblur = function() {
+                message.style.display = "none";
+            }
+
+            input.onkeyup = function() {
+                validations.forEach(validation => {
+                    const { regex, elementId, validClass, invalidClass } = validation;
+                    const element = document.getElementById(elementId);
+                    if (input.value.match(regex)) {
+                        element.classList.remove(invalidClass);
+                        element.classList.add(validClass);
+                    } else {
+                        element.classList.remove(validClass);
+                        element.classList.add(invalidClass);
+                    }
+                });
+            }
+        }
+
+        // Name field validations
+        addValidation('name', 'nameMessage', [  
+            { regex: /[0-9]/g, elementId: 'nameNumber', validClass: 'valid', invalidClass: 'invalid' },
+            { regex: /.{8,}/g, elementId: 'nameLength', validClass: 'valid', invalidClass: 'invalid' }
+        ]);
+
+        // Email field validations
+        addValidation('email', 'emailMessage', [
+            { regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, elementId: 'emailFormat', validClass: 'valid', invalidClass: 'invalid' }
+        ]);
+
+        // Subject field validations
+        addValidation('subject', 'subjectMessage', [
+            { regex: /.{5,}/g, elementId: 'subjectLength', validClass: 'valid', invalidClass: 'invalid' }
+        ]);
+
+        // Message field validations
+        addValidation('message', 'textMessage', [
+            { regex: /.{100,}/g, elementId: 'messageLength', validClass: 'valid', invalidClass: 'invalid' }
+        ]);
+    </script>
+</body>
+</html>
