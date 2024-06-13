@@ -25,12 +25,22 @@
         margin: -20px 0 0;
         align-self: flex-start;
       }
+      .preview-container img {
+        width: 100px;
+        height: auto;
+        margin: 5px;
+      }
     </style>
   </head>
   <body>
     <section class="support-container">
       <h1>Contact Support</h1>
-      <form id="supportForm" action="/submit_support_request" method="post" enctype="multipart/form-data">
+      <form
+        id="supportForm"
+        action="/submit_support_request"
+        method="post"
+        enctype="multipart/form-data"
+      >
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required />
         <div id="nameMessage" class="message">
@@ -56,12 +66,24 @@
         </div>
 
         <label for="file">File:</label>
-        <input type="file" id="file" name="file[]" accept=".jpg,.jpeg,.png" multiple required />
+        <input
+          type="file"
+          id="file"
+          name="file[]"
+          accept=".jpg,.jpeg,.png"
+          multiple
+          required
+        />
         <div id="fileMessage" class="message">
           <p id="fileNumber" class="invalid">Upload 1 to 4 images</p>
-          <p id="fileType" class="invalid">File must be an image (jpg, jpeg, png)</p>
-          <p id="fileSize" class="invalid">Each file size must be less than 2MB</p>
+          <p id="fileType" class="invalid">
+            File must be an image (jpg, jpeg, png)
+          </p>
+          <p id="fileSize" class="invalid">
+            Each file size must be less than 2MB
+          </p>
         </div>
+        <div class="preview-container" id="previewContainer"></div>
 
         <button type="submit">Submit</button>
       </form>
@@ -103,22 +125,50 @@
         }
       }
 
-      // File field validations
+      // Function to preview images
+      function previewImages(input, previewContainerId) {
+        const previewContainer = document.getElementById(previewContainerId);
+        previewContainer.innerHTML = ""; // Clear existing previews
+
+        Array.from(input.files).forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            previewContainer.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // File field validations and preview
+      const fileInput = document.getElementById("file");
+      fileInput.addEventListener("change", function () {
+        previewImages(fileInput, "previewContainer");
+      });
+
       addValidation("file", "fileMessage", [
         {
-          condition: input => input.files.length >= 1 && input.files.length <= 4,
+          condition: (input) =>
+            input.files.length >= 1 && input.files.length <= 4,
           elementId: "fileNumber",
           validClass: "valid",
           invalidClass: "invalid",
         },
         {
-          condition: input => Array.from(input.files).every(file => ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)),
+          condition: (input) =>
+            Array.from(input.files).every((file) =>
+              ["image/jpeg", "image/png", "image/jpg"].includes(file.type)
+            ),
           elementId: "fileType",
           validClass: "valid",
           invalidClass: "invalid",
         },
         {
-          condition: input => Array.from(input.files).every(file => file.size <= 2 * 1024 * 1024), // 2MB
+          condition: (input) =>
+            Array.from(input.files).every(
+              (file) => file.size <= 2 * 1024 * 1024
+            ), // 2MB
           elementId: "fileSize",
           validClass: "valid",
           invalidClass: "invalid",
@@ -128,7 +178,7 @@
       // Name field validations
       addValidation("name", "nameMessage", [
         {
-          condition: input => input.value.length >= 4,
+          condition: (input) => input.value.length >= 4,
           elementId: "nameLength",
           validClass: "valid",
           invalidClass: "invalid",
@@ -138,7 +188,7 @@
       // Email field validations
       addValidation("email", "emailMessage", [
         {
-          condition: input => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value),
+          condition: (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value),
           elementId: "emailFormat",
           validClass: "valid",
           invalidClass: "invalid",
@@ -148,7 +198,7 @@
       // Subject field validations
       addValidation("subject", "subjectMessage", [
         {
-          condition: input => input.value.length >= 5,
+          condition: (input) => input.value.length >= 5,
           elementId: "subjectLength",
           validClass: "valid",
           invalidClass: "invalid",
@@ -158,7 +208,7 @@
       // Message field validations
       addValidation("message", "textMessage", [
         {
-          condition: input => input.value.length >= 10,
+          condition: (input) => input.value.length >= 10,
           elementId: "messageLength",
           validClass: "valid",
           invalidClass: "invalid",
