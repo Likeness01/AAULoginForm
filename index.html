@@ -30,8 +30,11 @@
         height: auto;
         margin: 5px;
       }
-      .remove-btn {
+      .remove-btn:hover {
         display: block;
+      }
+      .remove-btn {
+        display: none;
         margin-top: 5px;
         color: red;
         cursor: pointer;
@@ -39,61 +42,63 @@
     </style>
   </head>
   <body>
-    <section class="support-container">
-      <h1>Contact Support</h1>
-      <form
-        id="supportForm"
-        action="/submit_support_request"
-        method="post"
-        enctype="multipart/form-data"
-      >
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required />
-        <div id="nameMessage" class="message">
-          <p id="nameLength" class="invalid">Minimum 4 characters</p>
-        </div>
+    <main class="div-rapid">
+      <section class="support-container">
+        <h1>Contact Support</h1>
+        <form
+          id="supportForm"
+          action="/submit_support_request"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required />
+          <div id="nameMessage" class="message">
+            <p id="nameLength" class="invalid">Minimum 4 characters</p>
+          </div>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required />
-        <div id="emailMessage" class="message">
-          <p id="emailFormat" class="invalid">Valid email format</p>
-        </div>
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+          <div id="emailMessage" class="message">
+            <p id="emailFormat" class="invalid">Valid email format</p>
+          </div>
 
-        <label for="subject">Subject:</label>
-        <input type="text" id="subject" name="subject" required />
-        <div id="subjectMessage" class="message">
-          <p id="subjectLength" class="invalid">Minimum 5 characters</p>
-        </div>
+          <label for="subject">Subject:</label>
+          <input type="text" id="subject" name="subject" required />
+          <div id="subjectMessage" class="message">
+            <p id="subjectLength" class="invalid">Minimum 5 characters</p>
+          </div>
 
-        <label for="message">Message:</label>
-        <textarea id="message" name="message" rows="5" required></textarea>
-        <div id="textMessage" class="message">
-          <p id="messageLength" class="invalid">Minimum 10 characters</p>
-        </div>
+          <label for="message">Message:</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+          <div id="textMessage" class="message">
+            <p id="messageLength" class="invalid">Minimum 10 characters</p>
+          </div>
 
-        <label for="file">File:</label>
-        <input
-          type="file"
-          id="file"
-          name="file[]"
-          accept=".jpg,.jpeg,.png"
-          multiple
-          required
-        />
-        <div id="fileMessage" class="message">
-          <p id="fileNumber" class="invalid">Upload 1 to 4 images</p>
-          <p id="fileType" class="invalid">
-            File must be an image (jpg, jpeg, png)
-          </p>
-          <p id="fileSize" class="invalid">
-            Each file size must be less than 2MB
-          </p>
-        </div>
-        <div class="preview-container" id="previewContainer"></div>
+          <label for="file">File:</label>
+          <input
+            type="file"
+            id="file"
+            name="file[]"
+            accept=".jpg,.jpeg,.png"
+            multiple
+            required
+          />
+          <div id="fileMessage" class="message">
+            <p id="fileNumber" class="invalid">Upload 1 to 4 images</p>
+            <p id="fileType" class="invalid">
+              File must be an image (jpg, jpeg, png)
+            </p>
+            <p id="fileSize" class="invalid">
+              Each file size must be less than 2MB
+            </p>
+          </div>
+          <div class="preview-container" id="previewContainer"></div>
 
-        <button type="submit">Submit</button>
-      </form>
-    </section>
+          <button type="submit">Submit</button>
+        </form>
+      </section>
+    </main>
 
     <script>
       "use strict";
@@ -180,12 +185,14 @@
         previewImages(fileInput, "previewContainer");
       });
 
-      document.getElementById("previewContainer").addEventListener("click", function (e) {
-        if (e.target.classList.contains("remove-btn")) {
-          const index = e.target.dataset.index;
-          removeImage(parseInt(index));
-        }
-      });
+      document
+        .getElementById("previewContainer")
+        .addEventListener("click", function (e) {
+          if (e.target.classList.contains("remove-btn")) {
+            const index = e.target.dataset.index;
+            removeImage(parseInt(index));
+          }
+        });
 
       addValidation("file", "fileMessage", [
         {
