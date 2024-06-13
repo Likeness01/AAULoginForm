@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Support System</title>
     <link rel="stylesheet" href="./styles.css" />
-    <link rel="icon" type="image/x-icon" href="https://aauekpoma.edu.ng/wp-content/themes/aaue/assets/images/favicon.ico">
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://aauekpoma.edu.ng/wp-content/themes/aaue/assets/images/favicon.ico"
+    />
     <style>
       .valid {
         color: green;
@@ -26,7 +30,12 @@
   <body>
     <section class="support-container">
       <h1>Contact Support</h1>
-      <form action="/submit_support_request" method="post">
+      <form
+        id="supportForm"
+        action="/submit_support_request"
+        method="post"
+        enctype="multipart/form-data"
+      >
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required />
         <div id="nameMessage" class="message">
@@ -48,7 +57,22 @@
         <label for="message">Message:</label>
         <textarea id="message" name="message" rows="5" required></textarea>
         <div id="textMessage" class="message">
-          <p id="messageLength" class="invalid">Minimum 100 characters</p>
+          <p id="messageLength" class="invalid">Minimum 10 characters</p>
+        </div>
+
+        <label for="file">File:</label>
+        <input
+          type="file"
+          id="file"
+          name="file"
+          accept=".jpg,.jpeg,.png"
+          required
+        />
+        <div id="fileMessage" class="message">
+          <p id="fileType" class="invalid">
+            File must be an image (jpg, jpeg, png)
+          </p>
+          <p id="fileSize" class="invalid">File size must be less than 2MB</p>
         </div>
 
         <button type="submit">Submit</button>
@@ -56,24 +80,15 @@
     </section>
 
     <script>
-      // Strict mode for better code quality
-        "use strict";
+      "use strict";
 
       // Function to add validation to input fields
       function addValidation(inputId, messageId, validations) {
         const input = document.getElementById(inputId);
         const message = document.getElementById(messageId);
 
-        // Event listeners for input field
-        input.addEventListener("blur", function () {
+        input.addEventListener("change", function () {
           validateInput(input, message, validations);
-        });
-
-        input.addEventListener("input", function () {
-          clearTimeout(input.timeout);
-          input.timeout = setTimeout(function () {
-            validateInput(input, message, validations);
-          }, 500);
         });
       }
 
@@ -81,9 +96,9 @@
       function validateInput(input, message, validations) {
         let isValid = true;
         validations.forEach((validation) => {
-          const { regex, elementId, validClass, invalidClass } = validation;
+          const { condition, elementId, validClass, invalidClass } = validation;
           const element = document.getElementById(elementId);
-          if (!regex.test(input.value)) {
+          if (!condition(input)) {
             element.classList.remove(validClass);
             element.classList.add(invalidClass);
             isValid = false;
@@ -100,10 +115,35 @@
         }
       }
 
+      // File field validations
+      addValidation("file", "fileMessage", [
+        {
+          condition: (input) => {
+            const file = input.files[0];
+            return (
+              file &&
+              ["image/jpeg", "image/png", "image/jpg"].includes(file.type)
+            );
+          },
+          elementId: "fileType",
+          validClass: "valid",
+          invalidClass: "invalid",
+        },
+        {
+          condition: (input) => {
+            const file = input.files[0];
+            return file && file.size <= 2 * 1024 * 1024; // 2MB
+          },
+          elementId: "fileSize",
+          validClass: "valid",
+          invalidClass: "invalid",
+        },
+      ]);
+
       // Name field validations
       addValidation("name", "nameMessage", [
         {
-          regex: /.{4,}/,
+          condition: (input) => input.value.length >= 4,
           elementId: "nameLength",
           validClass: "valid",
           invalidClass: "invalid",
@@ -113,7 +153,7 @@
       // Email field validations
       addValidation("email", "emailMessage", [
         {
-          regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+          condition: (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value),
           elementId: "emailFormat",
           validClass: "valid",
           invalidClass: "invalid",
@@ -123,7 +163,7 @@
       // Subject field validations
       addValidation("subject", "subjectMessage", [
         {
-          regex: /.{5,}/,
+          condition: (input) => input.value.length >= 5,
           elementId: "subjectLength",
           validClass: "valid",
           invalidClass: "invalid",
@@ -133,7 +173,7 @@
       // Message field validations
       addValidation("message", "textMessage", [
         {
-          regex: /.{100,}/,
+          condition: (input) => input.value.length >= 10,
           elementId: "messageLength",
           validClass: "valid",
           invalidClass: "invalid",
