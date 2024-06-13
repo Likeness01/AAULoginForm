@@ -30,12 +30,7 @@
   <body>
     <section class="support-container">
       <h1>Contact Support</h1>
-      <form
-        id="supportForm"
-        action="/submit_support_request"
-        method="post"
-        enctype="multipart/form-data"
-      >
+      <form id="supportForm" action="/submit_support_request" method="post" enctype="multipart/form-data">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required />
         <div id="nameMessage" class="message">
@@ -61,18 +56,11 @@
         </div>
 
         <label for="file">File:</label>
-        <input
-          type="file"
-          id="file"
-          name="file"
-          accept=".jpg,.jpeg,.png"
-          required
-        />
+        <input type="file" id="file" name="file[]" accept=".jpg,.jpeg,.png" multiple required />
         <div id="fileMessage" class="message">
-          <p id="fileType" class="invalid">
-            File must be an image (jpg, jpeg, png)
-          </p>
-          <p id="fileSize" class="invalid">File size must be less than 2MB</p>
+          <p id="fileNumber" class="invalid">Upload 1 to 4 images</p>
+          <p id="fileType" class="invalid">File must be an image (jpg, jpeg, png)</p>
+          <p id="fileSize" class="invalid">Each file size must be less than 2MB</p>
         </div>
 
         <button type="submit">Submit</button>
@@ -118,22 +106,19 @@
       // File field validations
       addValidation("file", "fileMessage", [
         {
-          condition: (input) => {
-            const file = input.files[0];
-            return (
-              file &&
-              ["image/jpeg", "image/png", "image/jpg"].includes(file.type)
-            );
-          },
+          condition: input => input.files.length >= 1 && input.files.length <= 4,
+          elementId: "fileNumber",
+          validClass: "valid",
+          invalidClass: "invalid",
+        },
+        {
+          condition: input => Array.from(input.files).every(file => ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)),
           elementId: "fileType",
           validClass: "valid",
           invalidClass: "invalid",
         },
         {
-          condition: (input) => {
-            const file = input.files[0];
-            return file && file.size <= 2 * 1024 * 1024; // 2MB
-          },
+          condition: input => Array.from(input.files).every(file => file.size <= 2 * 1024 * 1024), // 2MB
           elementId: "fileSize",
           validClass: "valid",
           invalidClass: "invalid",
@@ -143,7 +128,7 @@
       // Name field validations
       addValidation("name", "nameMessage", [
         {
-          condition: (input) => input.value.length >= 4,
+          condition: input => input.value.length >= 4,
           elementId: "nameLength",
           validClass: "valid",
           invalidClass: "invalid",
@@ -153,7 +138,7 @@
       // Email field validations
       addValidation("email", "emailMessage", [
         {
-          condition: (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value),
+          condition: input => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value),
           elementId: "emailFormat",
           validClass: "valid",
           invalidClass: "invalid",
@@ -163,7 +148,7 @@
       // Subject field validations
       addValidation("subject", "subjectMessage", [
         {
-          condition: (input) => input.value.length >= 5,
+          condition: input => input.value.length >= 5,
           elementId: "subjectLength",
           validClass: "valid",
           invalidClass: "invalid",
@@ -173,7 +158,7 @@
       // Message field validations
       addValidation("message", "textMessage", [
         {
-          condition: (input) => input.value.length >= 10,
+          condition: input => input.value.length >= 10,
           elementId: "messageLength",
           validClass: "valid",
           invalidClass: "invalid",
