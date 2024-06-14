@@ -1,4 +1,5 @@
 <?php
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -6,11 +7,11 @@ use PHPMailer\PHPMailer\Exception;
 require 'vendor/autoload.php';
 
 // Database configuration
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "support_form";
-$adminEmail = "support@aauekpoma.edu.ng";
+$servername = "localhost"; // Adjust as needed
+$username = "root"; // Adjust as needed
+$password = ""; // Adjust as needed
+$dbname = "support_form"; // Ensure this matches your database name
+$adminEmail = "############"; // Admin email address
 
 // Connect to the database
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -21,12 +22,14 @@ if ($conn->connect_error) {
 }
 
 // Function to validate email
-function validateEmail($email) {
+function validateEmail($email)
+{
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
 // Function to validate file
-function validateFile($file) {
+function validateFile($file)
+{
     $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
     $maxFileSize = 2 * 1024 * 1024; // 2MB
 
@@ -119,10 +122,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 try {
                     // Server settings
                     $mail->isSMTP();
-                    $mail->Host = 'smtp.example.com'; // Set the SMTP server to send through
+                    // Set the SMTP server to send through
+                    $mail->Host = 'smtp.adminEmail';
                     $mail->SMTPAuth = true;
-                    $mail->Username = 'your_email@example.com'; // SMTP username
-                    $mail->Password = 'your_email_password'; // SMTP password
+                    $mail->Username = 'adminEmail'; // SMTP username
+                    $mail->Password = '##########'; // SMTP password
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port = 587;
 
@@ -139,29 +143,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $mail->isHTML(true);
                     $mail->Subject = "New Support Request: " . $subject;
                     $mail->Body    = "You have received a new support request.<br><br>" .
-                                     "Name: $name<br>" .
-                                     "Email: $email<br>" .
-                                     "Subject: $subject<br>" .
-                                     "Message:<br>" . nl2br($message) . "<br><br>" .
-                                     "Please log in to the admin panel to view the details and attached files.";
+                        "Name: $name<br>" .
+                        "Email: $email<br>" .
+                        "Subject: $subject<br>" .
+                        "Message:<br>" . nl2br($message) . "<br><br>" .
+                        "Please log in to the admin panel to view the details and attached files.";
 
                     $mail->send();
-                    echo "Support request submitted successfully!";
+                    echo "Support request submitted successfully!</br> </br>";
                 } catch (Exception $e) {
-                    echo "Support request submitted, but failed to send email. Mailer Error: {$mail->ErrorInfo}";
+                    echo "Support request submitted, but failed to send email. Mailer Error: {$mail->ErrorInfo}<br/>";
                 }
             } else {
-                echo "Errors occurred: " . implode(", ", $errors);
+                echo "<br/>Errors occurred: " . implode(", ", $errors);
             }
         } else {
-            echo "Error: " . $stmt->error;
+            echo "<br/>Error: " . $stmt->error;
         }
 
         $stmt->close();
     } else {
-        echo "Errors occurred: " . implode(", ", $errors);
+        echo "<br/>Errors occurred: " . implode(", ", $errors);
     }
 
     $conn->close();
 }
-?>
+
