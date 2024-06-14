@@ -25,19 +25,29 @@
         margin: -20px 0 0;
         align-self: flex-start;
       }
-      .preview-container img {
-        width: 100px;
+      .preview-container {
         height: auto;
-        margin: 5px;
+        margin: 12px 6px;
+      }
+      .preview-container img {
+        width: 12rem;
+        height: auto;
+        margin: 13px;
       }
       .remove-btn:hover {
         display: block;
       }
       .remove-btn {
-        display: none;
-        margin-top: 5px;
+        z-index: 1;
+        top: 12px;
         color: red;
+        margin: auto;
+        display: block;
+        margin-top: 5px;
         cursor: pointer;
+        position: absolute;
+        background: snow;
+        font-size: xx-large;
       }
     </style>
   </head>
@@ -47,7 +57,7 @@
         <h1>Contact Support</h1>
         <form
           id="supportForm"
-          action="/submit_support_request"
+          action="./submit_support_request.php"
           method="post"
           enctype="multipart/form-data"
         >
@@ -152,7 +162,7 @@
             imgContainer.appendChild(img);
 
             const removeBtn = document.createElement("span");
-            removeBtn.textContent = "Remove";
+            removeBtn.textContent = "🗑";
             removeBtn.classList.add("remove-btn");
             removeBtn.dataset.index = index;
             imgContainer.appendChild(removeBtn);

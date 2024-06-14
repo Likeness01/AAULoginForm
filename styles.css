@@ -1,14 +1,15 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
   margin: 0;
   padding: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+}
+.div-rapid {
   height: 100vh;
 }
-
 .support-container {
   background: #fff;
   padding: 15px;
@@ -25,12 +26,12 @@ h1 {
   font-size: 24px;
   color: #333;
 }
-form{
-    width: 90%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
+form {
+  width: 90%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
 label {
   display: block;
