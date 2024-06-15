@@ -3,8 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Support System</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <title>Contact Us - Ambrose Alli University, Ekpoma</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
     <link
       rel="icon"
       type="image/x-icon"
@@ -49,228 +53,190 @@
         background: snow;
         font-size: xx-large;
       }
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
+
   <body>
-    <main class="div-rapid">
-      <section class="support-container">
-        <h1>Contact Support</h1>
-        <form
-          id="supportForm"
-          action="./submit_support_request.php"
-          method="post"
-          enctype="multipart/form-data"
-        >
-          <label for="name">Name:</label>
-          <input type="text" id="name" name="name" required />
-          <div id="nameMessage" class="message">
-            <p id="nameLength" class="invalid">Minimum 4 characters</p>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Admissions</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </nav>
+    </header>
+    <div class="parent">
+      <main>
+        <div class="form-container">
+          <div class="support-container">
+            <h1>Contact Support</h1>
+            <form
+              id="supportForm"
+              action="./submit_support_request.php"
+              method="post"
+              enctype="multipart/form-data"
+            >
+              <div class="row">
+                <label for="supportType">Support Type:</label>
+                <select id="supportType" name="supportType" required>
+                  <option value="">Select support type</option>
+                  <option value="ICT">ICT</option>
+                  <option value="Registrar">Registrar</option>
+                  <option value="Exams and Records">Exams and Records</option>
+                  <option value="Ell">Other</option>
+                </select>
+              </div>
+              <div id="supportTypeMessage" class="message">
+                <p id="supportTypeRequired" class="invalid">
+                  Please select a support type
+                </p>
+              </div>
+
+              <div class="row">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required />
+              </div>
+              <div id="nameMessage" class="message">
+                <p id="nameLength" class="invalid">Minimum 4 characters</p>
+              </div>
+
+              <div class="row">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div id="emailMessage" class="message">
+                <p id="emailFormat" class="invalid">Valid email format</p>
+              </div>
+
+              <div class="row">
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" name="subject" required />
+              </div>
+              <div id="subjectMessage" class="message">
+                <p id="subjectLength" class="invalid">Minimum 5 characters</p>
+              </div>
+
+              <div class="row">
+                <label for="message">Message:</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="5"
+                  required
+                ></textarea>
+              </div>
+              <div id="textMessage" class="message">
+                <p id="messageLength" class="invalid">Minimum 10 characters</p>
+              </div>
+
+              <div class="row">
+                <label for="file">File:</label>
+                <input
+                  type="file"
+                  id="file"
+                  name="file[]"
+                  accept=".jpg,.jpeg,.png"
+                  multiple
+                />
+              </div>
+              <div id="fileMessage" class="message">
+                <p id="fileNumber" class="invalid">Upload 1 to 4 images</p>
+                <p id="fileType" class="invalid">
+                  File must be an image (jpg, jpeg, png)
+                </p>
+                <p id="fileSize" class="invalid">
+                  Each file size must be less than 2MB
+                </p>
+              </div>
+              <div class="preview-container" id="previewContainer"></div>
+
+              <button type="submit" id="submitButton" data-loading-text="Submitting...">Submit</button>
+            </form>
           </div>
 
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required />
-          <div id="emailMessage" class="message">
-            <p id="emailFormat" class="invalid">Valid email format</p>
-          </div>
-
-          <label for="subject">Subject:</label>
-          <input type="text" id="subject" name="subject" required />
-          <div id="subjectMessage" class="message">
-            <p id="subjectLength" class="invalid">Minimum 5 characters</p>
-          </div>
-
-          <label for="message">Message:</label>
-          <textarea id="message" name="message" rows="5" required></textarea>
-          <div id="textMessage" class="message">
-            <p id="messageLength" class="invalid">Minimum 10 characters</p>
-          </div>
-
-          <label for="file">File:</label>
-          <input
-            type="file"
-            id="file"
-            name="file[]"
-            accept=".jpg,.jpeg,.png"
-            multiple
-            required
-          />
-          <div id="fileMessage" class="message">
-            <p id="fileNumber" class="invalid">Upload 1 to 4 images</p>
-            <p id="fileType" class="invalid">
-              File must be an image (jpg, jpeg, png)
+          <div class="contact-info">
+            <h2>Contact Information</h2>
+            <h3>Phones:</h3>
+            <div class="child">
+              <p>Monday to Friday: 8am to 4pm</p>
+              <p>+234 805 130 6155</p>
+              <p>+234 805 130 6005</p>
+            </div>
+            <h4>Other Contact:</h4>
+            <div class="child">
+              <p>
+                Vice Chancellor:
+                <a href="tel:+2349058494343">+234 905 849 4343</a>
+              </p>
+              <p>
+                Registrar:
+                <a href="tel:+2349058494345">+234 905 849 4345</a>
+              </p>
+            </div>
+            <p>
+              <strong>Email:</strong><br />
+            <div class="child">
+              <a href="mailto:info@aauekpoma.edu.ng"> info@aauekpoma.edu.ng</a>
+              <br />
+              <a href="mailto:registrar@aauekpoma.edu.ng"
+                >registrar@aauekpoma.edu.ng</a
+              >
+              <br />
+              <a href="mailto:examsrecords@aauekpoma.edu.ng"
+                >examsrecords@aauekpoma.edu.ng</a
+              >
+            </div>
+          </p>
+              
+            <p>
+              <strong>Address:</strong>
+              KM 70 Benin Auchi Road, P. M. B 14, Ekpoma, Edo State, Nigeria
             </p>
-            <p id="fileSize" class="invalid">
-              Each file size must be less than 2MB
+            <p>
+              <a
+                href="https://www.instagram.com/officialaauekpoma/"
+                target="_blank"
+              >
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a
+                href="https://www.facebook.com/officialaauekpoma/"
+                target="_blank"
+              >
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a
+                href="https://www.twitter.com/officialaauekpoma/"
+                target="_blank"
+              >
+                <i class="fab fa-twitter"></i>
+              </a>
             </p>
           </div>
-          <div class="preview-container" id="previewContainer"></div>
+        </div>
 
-          <button type="submit">Submit</button>
-        </form>
-      </section>
-    </main>
-
-    <script>
-      "use strict";
-
-      // Function to add validation to input fields
-      function addValidation(inputId, messageId, validations) {
-        const input = document.getElementById(inputId);
-        const message = document.getElementById(messageId);
-
-        input.addEventListener("change", function () {
-          validateInput(input, message, validations);
-        });
-      }
-
-      // Function to validate input
-      function validateInput(input, message, validations) {
-        let isValid = true;
-        validations.forEach((validation) => {
-          const { condition, elementId, validClass, invalidClass } = validation;
-          const element = document.getElementById(elementId);
-          if (!condition(input)) {
-            element.classList.remove(validClass);
-            element.classList.add(invalidClass);
-            isValid = false;
-          } else {
-            element.classList.remove(invalidClass);
-            element.classList.add(validClass);
-          }
-        });
-
-        if (isValid) {
-          message.style.display = "none";
-        } else {
-          message.style.display = "block";
-        }
-      }
-
-      // Function to preview images
-      function previewImages(input, previewContainerId) {
-        const previewContainer = document.getElementById(previewContainerId);
-        previewContainer.innerHTML = ""; // Clear existing previews
-
-        Array.from(input.files).forEach((file, index) => {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const imgContainer = document.createElement("div");
-            imgContainer.style.position = "relative";
-
-            const img = document.createElement("img");
-            img.src = e.target.result;
-            imgContainer.appendChild(img);
-
-            const removeBtn = document.createElement("span");
-            removeBtn.textContent = "🗑";
-            removeBtn.classList.add("remove-btn");
-            removeBtn.dataset.index = index;
-            imgContainer.appendChild(removeBtn);
-
-            previewContainer.appendChild(imgContainer);
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      // Remove image function
-      function removeImage(index) {
-        const fileInput = document.getElementById("file");
-        const dt = new DataTransfer();
-        const files = Array.from(fileInput.files);
-
-        files.forEach((file, i) => {
-          if (i !== index) {
-            dt.items.add(file);
-          }
-        });
-
-        fileInput.files = dt.files;
-        previewImages(fileInput, "previewContainer");
-      }
-
-      // File field validations and preview
-      const fileInput = document.getElementById("file");
-      fileInput.addEventListener("change", function () {
-        previewImages(fileInput, "previewContainer");
-      });
-
-      document
-        .getElementById("previewContainer")
-        .addEventListener("click", function (e) {
-          if (e.target.classList.contains("remove-btn")) {
-            const index = e.target.dataset.index;
-            removeImage(parseInt(index));
-          }
-        });
-
-      addValidation("file", "fileMessage", [
-        {
-          condition: (input) =>
-            input.files.length >= 1 && input.files.length <= 4,
-          elementId: "fileNumber",
-          validClass: "valid",
-          invalidClass: "invalid",
-        },
-        {
-          condition: (input) =>
-            Array.from(input.files).every((file) =>
-              ["image/jpeg", "image/png", "image/jpg"].includes(file.type)
-            ),
-          elementId: "fileType",
-          validClass: "valid",
-          invalidClass: "invalid",
-        },
-        {
-          condition: (input) =>
-            Array.from(input.files).every(
-              (file) => file.size <= 2 * 1024 * 1024
-            ), // 2MB
-          elementId: "fileSize",
-          validClass: "valid",
-          invalidClass: "invalid",
-        },
-      ]);
-
-      // Name field validations
-      addValidation("name", "nameMessage", [
-        {
-          condition: (input) => input.value.length >= 4,
-          elementId: "nameLength",
-          validClass: "valid",
-          invalidClass: "invalid",
-        },
-      ]);
-
-      // Email field validations
-      addValidation("email", "emailMessage", [
-        {
-          condition: (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value),
-          elementId: "emailFormat",
-          validClass: "valid",
-          invalidClass: "invalid",
-        },
-      ]);
-
-      // Subject field validations
-      addValidation("subject", "subjectMessage", [
-        {
-          condition: (input) => input.value.length >= 5,
-          elementId: "subjectLength",
-          validClass: "valid",
-          invalidClass: "invalid",
-        },
-      ]);
-
-      // Message field validations
-      addValidation("message", "textMessage", [
-        {
-          condition: (input) => input.value.length >= 10,
-          elementId: "messageLength",
-          validClass: "valid",
-          invalidClass: "invalid",
-        },
-      ]);
-    </script>
+        <div class="map">
+          <h2>Campus Map</h2>
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3962.2574298140694!2d6.081071!3d6.738419!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x10469539908d44a5%3A0x5658f0cae6d29f1f!2sAmbrose%20Alli%20University!5e0!3m2!1sen!2sng!4v1718357007043!5m2!1sen!2sng"
+            width="600"
+            height="450"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </main>
+    </div>
+    <footer>
+      <p>&copy; 2024 Ambrose Alli University, Ekpoma</p>
+    </footer>
+    <script src="./script.js"></script>
   </body>
 </html>
