@@ -144,10 +144,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $mail = new PHPMailer(true);
                 try {
                     $mail->isSMTP();
-                    $mail->Host = 'smtp.example.com'; // Adjust to your SMTP host
+                    $mail->Host = 'smtp.support@dfgh.edu.ng'; // Adjust to your SMTP host
                     $mail->SMTPAuth = true;
-                    $mail->Username = 'support@aauekpoma.edu.ng'; // SMTP username
-                    $mail->Password = 'NR9WQ}ER4dwP'; // SMTP password
+                    $mail->Username = 'support@dfghj.edu.ng'; // SMTP username
+                    $mail->Password = '######wP'; // SMTP password
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port = 587;
 

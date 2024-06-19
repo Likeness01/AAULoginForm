@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const submitButton = document.getElementById("submitButton");
 
   // Add event listener for form submission
-  supportForm.addEventListener("submit", function (event) {
+  supportForm.addEventListener("submit", async function (event) {
     event.preventDefault(); // Prevent default form submission
 
     // Perform client-side validation before submitting
@@ -15,28 +15,33 @@ document.addEventListener("DOMContentLoaded", function () {
       toggleButtonLoadingState(true); // Enable loading state on submit
 
       // Use fetch to send data to PHP backend
-      fetch("submit_support_request.php", {
+      await fetch("./server/index.php", {
         method: "POST",
         body: formData,
       })
-        .then((response) => response.json())
-        .then((data) => {
+        .then(async (response) => {
+          return response.json(); // Ensure the response is parsed as JSON
+        })
+        .then(async (data) => {
           if (data.success) {
             // Display success message or handle success scenario
             console.log("Form submitted successfully:", data);
-            showFlashMessage('success', 'Your form has been successfully submitted!');
+            await showFlashMessage(
+              "success",
+              "Your form has been successfully submitted!"
+            );
 
             // Reset form or redirect to success page
             supportForm.reset(); // Reset form fields
           } else {
             // Display error message or handle error scenario
             console.error("Form submission error:", data.error);
-            showFlashMessage('error', `Form submission error: ${data.error}`);
+            showFlashMessage("error", `Form submission error: ${data.error}`);
           }
         })
         .catch((error) => {
           console.error("Error submitting form:", error);
-          showFlashMessage('error', `Error submitting form: ${error}`);
+          showFlashMessage("error", `Error submitting form: ${error}`);
         })
         .finally(() => {
           toggleButtonLoadingState(false);
@@ -155,34 +160,31 @@ function validateForm() {
 }
 
 // Function to show flash message
-function showFlashMessage(type, message) {
-  const flashMessage = document.getElementById('flashMessage');
+async function showFlashMessage(type, message) {
+  const flashMessage = document.getElementById("flashMessage");
 
   // Set the message text and class based on the type
   flashMessage.textContent = message;
   flashMessage.className = `flash-message ${type}`;
 
   // Slide in the flash message
-  flashMessage.style.right = '20px';
+  flashMessage.style.right = "20px";
 
-  // Hide the message after 5 minutes (300000 milliseconds)
-  setTimeout(() => {
-    flashMessage.style.opacity = '0';
-    flashMessage.style.right = '-300px';
-  }, 3000);
+  // Hide the message after 1 minutes (60000 milliseconds)
+  await setTimeout(() => {
+    flashMessage.style.opacity = "0";
+    flashMessage.style.right = "-300px";
+  }, 30000);
 
   // Remove the flash message from the DOM after it slides out
-  flashMessage.addEventListener('transitionend', () => {
-    if (flashMessage.style.right === '-300px') {
-      flashMessage.style.opacity = '1';
-      flashMessage.textContent = '';
-      flashMessage.className = 'flash-message';
+  flashMessage.addEventListener("transitionend", () => {
+    if (flashMessage.style.right === "-300px") {
+      flashMessage.style.opacity = "1";
+      flashMessage.textContent = "";
+      flashMessage.className = "flash-message";
     }
   });
 }
-
-// Unused methods commented out
-
 
 async function uploadFile(file) {
   const formData = new FormData();
@@ -213,7 +215,7 @@ async function uploadFile(file) {
 async function submitForm(formData) {
   try {
     console.log("Submitting form:", formData);
-    const response = await fetch("submit_support_request.php", {
+    const response = await fetch("./server/index.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -410,5 +412,3 @@ fileInput.addEventListener("change", function () {
     uploadFile(file);
   });
 });
-
-
