@@ -6,19 +6,31 @@ use PHPMailer\PHPMailer\Exception;
 // Load Composer's autoloader
 require 'vendor/autoload.php';
 
+// Suppress PHP errors and warnings
+error_reporting(0);
+ini_set('display_errors', 0);
+
 // Database configuration
-$servername = "localhost"; // Adjust as needed
-$username = "root"; // Adjust as needed
-$password = ""; // Adjust as needed
-$dbname = "support_form"; // Ensure this matches your database name
-$adminEmail = "############"; // Admin email address
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "support_form";
+$adminEmail = "admin@example.com";
 
 // Connect to the database
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    sendErrorResponse("Connection failed: " . $conn->connect_error);
+}
+
+// Function to send JSON error response
+function sendErrorResponse($error)
+{
+    header('Content-Type: application/json');
+    echo json_encode(["success" => false, "error" => $error]);
+    exit();
 }
 
 // Function to validate email
@@ -30,14 +42,14 @@ function validateEmail($email)
 // Function to validate file
 function validateFile($file)
 {
+    if ($file['size'] === 0) {
+        return true; // Skip validation for empty file
+    }
+
     $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
     $maxFileSize = 2 * 1024 * 1024; // 2MB
 
-    if (!in_array($file['type'], $allowedMimeTypes)) {
-        return false;
-    }
-
-    if ($file['size'] > $maxFileSize) {
+    if (!in_array($file['type'], $allowedMimeTypes) || $file['size'] > $maxFileSize) {
         return false;
     }
 
@@ -47,12 +59,21 @@ function validateFile($file)
 // Initialize error array
 $errors = [];
 
+// Allowed support types
+$allowedSupportTypes = ["ICT", "Registrar", "Exams_and_Records", "Other"];
+
 // Check and sanitize form inputs
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $supportType = trim($_POST['supportType']);
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $subject = trim($_POST['subject']);
     $message = trim($_POST['message']);
+
+    // Validate support type
+    if (!in_array($supportType, $allowedSupportTypes)) {
+        $errors[] = "Invalid support type selected.";
+    }
 
     // Validate inputs
     if (strlen($name) < 4) {
@@ -73,27 +94,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validate files
     $files = $_FILES['file'];
-    $fileCount = count($files['name']);
-    if ($fileCount < 1 || $fileCount > 4) {
-        $errors[] = "You must upload between 1 and 4 images.";
-    }
+    if (!empty($files['name'][0])) {
+        $fileCount = count($files['name']);
+        if ($fileCount < 1 || $fileCount > 4) {
+            $errors[] = "You must upload between 1 and 4 images.";
+        }
 
-    for ($i = 0; $i < $fileCount; $i++) {
-        if (!validateFile([
-            'name' => $files['name'][$i],
-            'type' => $files['type'][$i],
-            'tmp_name' => $files['tmp_name'][$i],
-            'error' => $files['error'][$i],
-            'size' => $files['size'][$i]
-        ])) {
-            $errors[] = "File " . $files['name'][$i] . " is invalid.";
+        for ($i = 0; $i < $fileCount; $i++) {
+            if (!validateFile([
+                'name' => $files['name'][$i],
+                'type' => $files['type'][$i],
+                'tmp_name' => $files['tmp_name'][$i],
+                'error' => $files['error'][$i],
+                'size' => $files['size'][$i]
+            ])) {
+                $errors[] = "File " . $files['name'][$i] . " is invalid.";
+            }
         }
     }
 
     // If no errors, proceed to store data
     if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO support_requests (name, email, subject, message) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $name, $email, $subject, $message);
+        $stmt = $conn->prepare("INSERT INTO support_requests (support_type, name, email, subject, message) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $supportType, $name, $email, $subject, $message);
 
         if ($stmt->execute()) {
             $lastId = $conn->insert_id;
@@ -105,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $fileName = basename($files['name'][$key]);
                 $uploadFilePath = $uploadDir . $lastId . '_' . $fileName;
 
-                if (move_uploaded_file($tmpName, $uploadFilePath)) {
+                if ($files['size'][$key] > 0 && move_uploaded_file($tmpName, $uploadFilePath)) {
                     // Insert file record into database
                     $stmt = $conn->prepare("INSERT INTO support_files (support_request_id, file_path) VALUES (?, ?)");
                     $stmt->bind_param("is", $lastId, $uploadFilePath);
@@ -120,29 +143,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Send email to admin with PHPMailer
                 $mail = new PHPMailer(true);
                 try {
-                    // Server settings
                     $mail->isSMTP();
-                    // Set the SMTP server to send through
-                    $mail->Host = 'smtp.adminEmail';
+                    $mail->Host = 'smtp.example.com'; // Adjust to your SMTP host
                     $mail->SMTPAuth = true;
-                    $mail->Username = 'adminEmail'; // SMTP username
-                    $mail->Password = '##########'; // SMTP password
+                    $mail->Username = 'support@aauekpoma.edu.ng'; // SMTP username
+                    $mail->Password = 'NR9WQ}ER4dwP'; // SMTP password
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port = 587;
 
-                    // Recipients
-                    $mail->setFrom('no-reply@example.com', 'Support System');
+                    $mail->setFrom('support@aauekpoma.edu.ng', 'Support System');
                     $mail->addAddress($adminEmail);
 
-                    // Attachments
                     foreach ($uploadedFilePaths as $filePath) {
                         $mail->addAttachment($filePath);
                     }
 
-                    // Content
                     $mail->isHTML(true);
                     $mail->Subject = "New Support Request: " . $subject;
                     $mail->Body    = "You have received a new support request.<br><br>" .
+                        "Support Type: $supportType<br>" .
                         "Name: $name<br>" .
                         "Email: $email<br>" .
                         "Subject: $subject<br>" .
@@ -150,22 +169,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         "Please log in to the admin panel to view the details and attached files.";
 
                     $mail->send();
-                    echo "Support request submitted successfully!</br> </br>";
+                    $response = ["success" => true];
                 } catch (Exception $e) {
-                    echo "Support request submitted, but failed to send email. Mailer Error: {$mail->ErrorInfo}<br/>";
+                    $response = [
+                        "success" => false,
+                        "error" => "Support request submitted, but failed to send email. Mailer Error: {$mail->ErrorInfo}"
+                    ];
                 }
             } else {
-                echo "<br/>Errors occurred: " . implode(", ", $errors);
+                $response = [
+                    "success" => false,
+                    "error" => "Errors occurred: " . implode(", ", $errors)
+                ];
             }
         } else {
-            echo "<br/>Error: " . $stmt->error;
+            $response = [
+                "success" => false,
+                "error" => "Error: " . $stmt->error
+            ];
         }
 
         $stmt->close();
     } else {
-        echo "<br/>Errors occurred: " . implode(", ", $errors);
+        $response = [
+            "success" => false,
+            "error" => "Errors occurred: " . implode(", ", $errors)
+        ];
     }
 
     $conn->close();
-}
 
+    // Return JSON response to JavaScript
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit();
+}

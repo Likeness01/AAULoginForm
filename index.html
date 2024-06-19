@@ -60,6 +60,8 @@
   </head>
 
   <body>
+    <!-- Flash message container -->
+    <div id="flashMessage" class="flash-message"></div>
     <header>
       <nav>
         <ul>
@@ -77,7 +79,7 @@
             <h1>Contact Support</h1>
             <form
               id="supportForm"
-              action="./submit_support_request.php"
+              action=""
               method="post"
               enctype="multipart/form-data"
             >
@@ -87,8 +89,8 @@
                   <option value="">Select support type</option>
                   <option value="ICT">ICT</option>
                   <option value="Registrar">Registrar</option>
-                  <option value="Exams and Records">Exams and Records</option>
-                  <option value="Ell">Other</option>
+                  <option value="Exams_and_Records">Exams and Records</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
               <div id="supportTypeMessage" class="message">

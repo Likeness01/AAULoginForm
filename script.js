@@ -10,27 +10,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Perform client-side validation before submitting
     if (validateForm()) {
-      const formData = {
-        supportType: supportForm.supportType.value,
-        name: supportForm.name.value,
-        email: supportForm.email.value,
-        subject: supportForm.subject.value,
-        message: supportForm.message.value,
-        files: Array.from(fileInput.files),
-      };
+      const formData = new FormData(supportForm);
 
       toggleButtonLoadingState(true); // Enable loading state on submit
 
-      submitForm(formData)
-        .then(() => {
-          toggleButtonLoadingState(false); // Disable loading state on successful submission
+      // Use fetch to send data to PHP backend
+      fetch("submit_support_request.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Display success message or handle success scenario
+            console.log("Form submitted successfully:", data);
+            showFlashMessage('success', 'Your form has been successfully submitted!');
+
+            // Reset form or redirect to success page
+            supportForm.reset(); // Reset form fields
+          } else {
+            // Display error message or handle error scenario
+            console.error("Form submission error:", data.error);
+            showFlashMessage('error', `Form submission error: ${data.error}`);
+          }
         })
-        .catch(() => {
-          toggleButtonLoadingState(false); // Disable loading state on submission failure
+        .catch((error) => {
+          console.error("Error submitting form:", error);
+          showFlashMessage('error', `Error submitting form: ${error}`);
+        })
+        .finally(() => {
+          toggleButtonLoadingState(false);
         });
     } else {
       console.log("Form validation failed.");
-      console.log(validateForm());
     }
   });
 });
@@ -54,6 +66,7 @@ function validateForm() {
   const supportTypeInput = document.getElementById("supportType");
   if (supportTypeInput.value.trim() === "") {
     document.getElementById("supportTypeRequired").classList.add("invalid");
+    console.log("Validate support type failed.");
     isValid = false;
   } else {
     document.getElementById("supportTypeRequired").classList.remove("invalid");
@@ -63,6 +76,7 @@ function validateForm() {
   const nameInput = document.getElementById("name");
   if (nameInput.value.length < 4) {
     document.getElementById("nameLength").classList.add("invalid");
+    console.log("Validate name failed.");
     isValid = false;
   } else {
     document.getElementById("nameLength").classList.remove("invalid");
@@ -72,6 +86,7 @@ function validateForm() {
   const emailInput = document.getElementById("email");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
     document.getElementById("emailFormat").classList.add("invalid");
+    console.log("Validate email failed.");
     isValid = false;
   } else {
     document.getElementById("emailFormat").classList.remove("invalid");
@@ -81,6 +96,7 @@ function validateForm() {
   const subjectInput = document.getElementById("subject");
   if (subjectInput.value.length < 5) {
     document.getElementById("subjectLength").classList.add("invalid");
+    console.log("Validate subject failed.");
     isValid = false;
   } else {
     document.getElementById("subjectLength").classList.remove("invalid");
@@ -90,51 +106,83 @@ function validateForm() {
   const messageInput = document.getElementById("message");
   if (messageInput.value.length < 10) {
     document.getElementById("messageLength").classList.add("invalid");
+    console.log("Validate message failed.");
     isValid = false;
   } else {
     document.getElementById("messageLength").classList.remove("invalid");
   }
 
-  // Validate file input
+  // Validate file input if not empty
   const fileInput = document.getElementById("file");
   const fileMessages = document
     .getElementById("fileMessage")
     .querySelectorAll("p");
 
-  if (fileInput.files.length == 0 || fileInput.files.length > 4) {
-    fileMessages[0].classList.add("invalid");
-    isValid = false;
+  if (fileInput.files.length > 0) {
+    const validFileTypes = ["image/jpeg", "image/png", "image/jpg"];
+    const validSize = 2 * 1024 * 1024; // 2MB
+
+    const files = Array.from(fileInput.files);
+
+    // Check if any file has an invalid type
+    const invalidType = files.some(
+      (file) => !validFileTypes.includes(file.type)
+    );
+    if (invalidType) {
+      fileMessages[0].classList.add("invalid");
+      isValid = false;
+      console.log("Invalid file type.");
+    } else {
+      fileMessages[0].classList.remove("invalid");
+    }
+
+    // Check if any file exceeds the size limit
+    const invalidSize = files.some((file) => file.size > validSize);
+    if (invalidSize) {
+      fileMessages[1].classList.add("invalid");
+      isValid = false;
+      console.log("File size exceeds the limit.");
+    } else {
+      fileMessages[1].classList.remove("invalid");
+    }
   } else {
+    // Clear previous error messages if no files are selected
     fileMessages[0].classList.remove("invalid");
-  }
-
-  const validFileTypes = ["image/jpeg", "image/png", "image/jpg"];
-  const validSize = 2 * 1024 * 1024; // 2MB
-
-  if (
-    !Array.from(fileInput.files).every((file) =>
-      validFileTypes.includes(file.type)
-    )
-  ) {
-    fileMessages[1].classList.add("invalid");
-    isValid = false;
-  } else {
     fileMessages[1].classList.remove("invalid");
-  }
-
-  if (!Array.from(fileInput.files).every((file) => file.size <= validSize)) {
-    fileMessages[2].classList.add("invalid");
-    isValid = false;
-  } else {
-    fileMessages[2].classList.remove("invalid");
   }
 
   return isValid;
 }
 
-// Remaining functions like uploadFile, previewImages, removeImage, addValidation are as previously defined
+// Function to show flash message
+function showFlashMessage(type, message) {
+  const flashMessage = document.getElementById('flashMessage');
 
-// function to handle form submission
+  // Set the message text and class based on the type
+  flashMessage.textContent = message;
+  flashMessage.className = `flash-message ${type}`;
+
+  // Slide in the flash message
+  flashMessage.style.right = '20px';
+
+  // Hide the message after 5 minutes (300000 milliseconds)
+  setTimeout(() => {
+    flashMessage.style.opacity = '0';
+    flashMessage.style.right = '-300px';
+  }, 3000);
+
+  // Remove the flash message from the DOM after it slides out
+  flashMessage.addEventListener('transitionend', () => {
+    if (flashMessage.style.right === '-300px') {
+      flashMessage.style.opacity = '1';
+      flashMessage.textContent = '';
+      flashMessage.className = 'flash-message';
+    }
+  });
+}
+
+// Unused methods commented out
+
 
 async function uploadFile(file) {
   const formData = new FormData();
@@ -363,11 +411,4 @@ fileInput.addEventListener("change", function () {
   });
 });
 
-// Example usage for form submission (adjust data structure to match your form fields)
-const formData = {
-  name: "John Doe",
-  email: "john.doe@example.com",
-  subject: "Example Subject",
-  message: "Example message content",
-};
-console.log("Initial form data:", formData);
+
