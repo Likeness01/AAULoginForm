@@ -2,6 +2,7 @@
 
 require 'config.php';
 require 'validation.php';
+require 'file_upload.php';  // This should include handleFileUploads function
 require 'email.php';
 
 // Enable error reporting
@@ -14,6 +15,8 @@ $errors = [];
 
 // Allowed support types
 $allowedSupportTypes = ["ICT", "Registrar", "Exams_and_Records", "Other"];
+
+$response = ['success' => false, 'error' => ''];  // Initialize response array
 
 try {
     // Check and sanitize form inputs
@@ -49,20 +52,20 @@ try {
         // Validate files
         $files = $_FILES['file'];
         if (!empty($files['name'][0])) {
-            $fileCount = count($files['name']);
+            $fileCount = is_array($files['name']) ? count($files['name']) : 1;
             if ($fileCount < 1 || $fileCount > 4) {
                 $errors[] = "You must upload between 1 and 4 images.";
             }
 
             for ($i = 0; $i < $fileCount; $i++) {
                 if (!validateFile([
-                    'name' => $files['name'][$i],
-                    'type' => $files['type'][$i],
-                    'tmp_name' => $files['tmp_name'][$i],
-                    'error' => $files['error'][$i],
-                    'size' => $files['size'][$i]
+                    'name' => is_array($files['name']) ? $files['name'][$i] : $files['name'],
+                    'type' => is_array($files['type']) ? $files['type'][$i] : $files['type'],
+                    'tmp_name' => is_array($files['tmp_name']) ? $files['tmp_name'][$i] : $files['tmp_name'],
+                    'error' => is_array($files['error']) ? $files['error'][$i] : $files['error'],
+                    'size' => is_array($files['size']) ? $files['size'][$i] : $files['size']
                 ])) {
-                    $errors[] = "File " . $files['name'][$i] . " is invalid.";
+                    $errors[] = "File " . (is_array($files['name']) ? $files['name'][$i] : $files['name']) . " is invalid.";
                 }
             }
         }
@@ -83,27 +86,29 @@ try {
 
                 // If file uploads succeeded, send email
                 if (empty($errors)) {
-                    $emailResult = sendEmail($supportType, $name, $email, $subject, $message, $uploadedFilePaths);
+                    $emailResult = sendEmail($supportType, $name, $email, $subject, $message, $uploadedFilePaths, "Peterotakhor@aauekpoma.edu.ng");
                     if ($emailResult['success']) {
-                        echo json_encode(['success' => true]);
+                        $response['success'] = true;
                     } else {
                         $errors[] = $emailResult['error'];
-                        echo json_encode(['success' => false, 'error' => implode(', ', $errors)]);
                     }
-                } else {
-                    echo json_encode(['success' => false, 'error' => implode(', ', $errors)]);
                 }
-            } else {
-                $errors[] = "Failed to insert support request.";
-                echo json_encode(['success' => false, 'error' => implode(', ', $errors)]);
             }
-        } else {
-            echo json_encode(['success' => false, 'error' => implode(', ', $errors)]);
         }
+
+        if (!empty($errors)) {
+            $response['error'] = implode(', ', $errors);
+        }
+    } else {
+        $response['error'] = 'Invalid request method.';
     }
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    $response['error'] = $e->getMessage();
 }
+
+header('Content-Type: application/json');
+echo json_encode($response);
+exit();
 
 // Function to insert support request and return last inserted ID
 function insertSupportRequest($supportType, $name, $email, $subject, $message)
